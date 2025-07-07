@@ -1,0 +1,11 @@
+# Python venv
+venv/
+__pycache__/
+*.pyc
+
+# 念のため .env も除外
+.env
+
+# 実行ログ・出力
+*.log
+*.txt
