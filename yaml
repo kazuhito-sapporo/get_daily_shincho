@@ -1,0 +1,13 @@
+
+---
+
+## ✅ 2. PDF保存機能（`weasyprint` 利用）
+
+### 📦 依存パッケージに追加（`requirements.txt`）
+
+```txt
+streamlit
+beautifulsoup4
+requests
+python-dotenv
+weasyprint

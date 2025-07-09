@@ -1,11 +1,13 @@
-# Python venv
+# Python仮想環境
 venv/
 __pycache__/
-*.pyc
 
-# 念のため .env も除外
-.env
+# Streamlitのキャッシュ
+.streamlit/
 
-# 実行ログ・出力
-*.log
-*.txt
+# 保存ファイル
+saved_articles/
+
+# エディタやOSのファイル
+.DS_Store
+*.swp
