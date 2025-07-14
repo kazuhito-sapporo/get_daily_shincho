@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.env
+venv/
+.saved_articles/
+.saved_articles/*

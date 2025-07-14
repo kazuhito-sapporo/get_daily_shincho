@@ -1,3 +1,4 @@
+
 import streamlit as st
 import requests
 from bs4 import BeautifulSoup
@@ -16,7 +17,7 @@ import os
 SAVE_DIR = "./saved_articles"
 os.makedirs(SAVE_DIR, exist_ok=True)
 
-# --- Seleniumドライバ設定 ---
+# --- Seleniumドライバ取得 ---
 def get_driver():
     options = Options()
     options.add_argument("--headless")
@@ -26,7 +27,7 @@ def get_driver():
     service = Service(ChromeDriverManager().install())
     return webdriver.Chrome(service=service, options=options)
 
-# --- デイリー新潮 記事一覧取得 ---
+# --- デイリー新潮：記事一覧取得 ---
 def get_daily_shincho_articles():
     driver = get_driver()
     driver.get("https://www.dailyshincho.jp/")
@@ -34,7 +35,6 @@ def get_daily_shincho_articles():
 
     articles = []
     elements = driver.find_elements(By.CSS_SELECTOR, "a:has(p.c-list-article__caption)")
-
     for elem in elements:
         try:
             title_elem = elem.find_element(By.CSS_SELECTOR, "p.c-list-article__caption")
@@ -51,16 +51,14 @@ def get_daily_shincho_articles():
 # --- 本文取得（Selenium）---
 def get_article_body_selenium(url):
     driver = get_driver()
-    driver.get(url)
-
     try:
+        driver.get(url)
         WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.CSS_SELECTOR, "article")))
         time.sleep(2)
         elems = driver.find_elements(By.CSS_SELECTOR, "article p")
         body = "\n".join([e.text for e in elems if e.text.strip()])
     except Exception as e:
         body = f"（本文取得中にエラーが発生しました: {e}）"
-
     driver.quit()
     return body or "（本文が空です）"
 
@@ -78,45 +76,54 @@ def get_article_body_bs4(url):
         return f"（本文取得に失敗しました: {e}）"
 
 # --- Streamlit UI ---
-st.set_page_config(page_title="デイリー新潮ビューア", layout="centered")
-st.title("📰 デイリー新潮 - 記事取得アプリ")
+st.set_page_config(page_title="記事取得アプリ", layout="centered")
+st.title("🗞️ 複数メディア対応記事ビューア")
 
-# 本文取得方法の切替
+media = st.radio("📰 メディアを選択", ["デイリー新潮", "文春オンライン"], horizontal=True)
 method = st.radio("📖 本文取得方法", ["Selenium", "BeautifulSoup"], horizontal=True)
 
-# 記事取得ボタン
-if st.button("🗞️ 記事一覧を取得"):
-    with st.spinner("記事一覧を取得中..."):
-        st.session_state.articles = get_daily_shincho_articles()
-        st.session_state.body = ""
-        st.session_state.selected_title = ""
+if media == "デイリー新潮":
+    if st.button("🗞️ 新潮記事一覧を取得"):
+        with st.spinner("記事一覧を取得中..."):
+            st.session_state.articles = get_daily_shincho_articles()
+            st.session_state.body = ""
+            st.session_state.selected_title = ""
 
-# 記事選択と本文表示
-if "articles" in st.session_state and st.session_state.articles:
-    titles = [a["title"] for a in st.session_state.articles]
-    selected_title = st.selectbox("📰 記事を選択", titles)
-    selected_article = next((a for a in st.session_state.articles if a["title"] == selected_title), None)
+    if "articles" in st.session_state and st.session_state.articles:
+        titles = [a["title"] for a in st.session_state.articles]
+        selected_title = st.selectbox("📰 記事を選択", titles)
+        selected_article = next((a for a in st.session_state.articles if a["title"] == selected_title), None)
 
-    if selected_article:
-        st.markdown(f"🔗 [記事リンクを開く]({selected_article['url']})")
+        if selected_article:
+            st.markdown(f"🔗 [記事リンクを開く]({selected_article['url']})")
+            if st.button("📖 本文を表示"):
+                with st.spinner("本文を取得中..."):
+                    if method == "Selenium":
+                        st.session_state.body = get_article_body_selenium(selected_article["url"])
+                    else:
+                        st.session_state.body = get_article_body_bs4(selected_article["url"])
+                st.session_state.selected_title = selected_title
 
+elif media == "文春オンライン":
+    url = st.text_input("🔗 記事URLを入力してください（例: https://bunshun.jp/articles/-/XXXXX）")
+    if url:
         if st.button("📖 本文を表示"):
             with st.spinner("本文を取得中..."):
                 if method == "Selenium":
-                    st.session_state.body = get_article_body_selenium(selected_article["url"])
+                    st.session_state.body = get_article_body_selenium(url)
                 else:
-                    st.session_state.body = get_article_body_bs4(selected_article["url"])
-            st.success("✅ 本文を取得しました。")
+                    st.session_state.body = get_article_body_bs4(url)
+            st.session_state.selected_title = "文春オンライン記事"
 
-# 本文表示＆保存
+# --- 本文表示＆保存 ---
 if "body" in st.session_state and st.session_state.body:
     st.subheader("📄 記事本文")
     st.write(st.session_state.body)
 
     if st.button("💾 テキスト保存"):
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        safe_title = selected_title[:30].replace(" ", "_").replace("/", "_").replace(":", "_")
+        safe_title = st.session_state.selected_title[:30].replace(" ", "_").replace("/", "_").replace(":", "_")
         filename = os.path.join(SAVE_DIR, f"{safe_title}_{timestamp}.txt")
         with open(filename, "w", encoding="utf-8") as f:
-            f.write(f"{selected_title}\n{selected_article['url']}\n\n{st.session_state.body}")
+            f.write(f"{st.session_state.selected_title}\n{url if media == '文春オンライン' else selected_article['url']}\n\n{st.session_state.body}")
         st.success(f"✅ 保存しました: {filename}")

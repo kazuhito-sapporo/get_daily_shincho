@@ -1,20 +1,39 @@
-# 📰 Daily Shincho Scraper
+# 複数メディア対応 記事ビューア
 
-これは、デイリー新潮のトップページから記事一覧を取得し、本文を抽出・保存する Streamlit アプリです。
+## 概要
+このアプリは、以下2つのメディア記事を取得・表示・保存できます：
 
-## ✅ 機能
+- 📰 デイリー新潮（記事一覧から選択）
+- 📰 文春オンライン（記事URLを手動で入力）
 
-- 記事一覧を自動取得（Selenium使用）
-- 記事タイトルを選択し、本文を取得・表示（Selenium / BeautifulSoup 選択可）
-- 本文を `.txt` 形式で保存
+## 機能
+- Selenium または BeautifulSoup による本文取得
+- テキストファイルへの保存機能
+- Streamlit UIで簡単操作
 
-## 🚀 使用方法
+## セットアップ
 
-```bash
-git clone https://github.com/あなたのユーザー名/daily_shincho_scraper.git
-cd daily_shincho_scraper
+1. 仮想環境作成（推奨）:
+
+```
 python -m venv venv
-source venv/bin/activate  # Windowsなら venv\Scripts\activate
-pip install -r requirements.txt
-streamlit run app.py
+source venv/bin/activate  # Windowsは venv\Scripts\activate
+```
 
+2. 必要ライブラリのインストール:
+
+```
+pip install -r requirements.txt
+```
+
+3. 実行:
+
+```
+streamlit run app.py
+```
+
+## 保存先
+保存した記事は `saved_articles/` ディレクトリに `.txt` 形式で保存されます。
+
+## 注意
+- 文春オンラインは一覧取得できないため、URLを直接貼り付けてください。
