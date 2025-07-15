@@ -1,39 +1,19 @@
-# 複数メディア対応 記事ビューア
+# 🗞️ 複数メディア対応記事ビューア
 
-## 概要
-このアプリは、以下2つのメディア記事を取得・表示・保存できます：
+このアプリは「デイリー新潮」と「文春オンライン」の記事本文を表示・保存できるStreamlitアプリです。
 
-- 📰 デイリー新潮（記事一覧から選択）
-- 📰 文春オンライン（記事URLを手動で入力）
+## 主な機能
+- 新潮記事の取得と表示
+- 文春記事URLを入力して本文取得
+- テキスト保存機能つき
 
-## 機能
-- Selenium または BeautifulSoup による本文取得
-- テキストファイルへの保存機能
-- Streamlit UIで簡単操作
+## 使用技術
+- Python
+- Streamlit
+- BeautifulSoup4
 
-## セットアップ
+## 使用方法
+1. `streamlit run app.py` でローカル起動
+2. または、Streamlit Cloud にデプロイしてWebで利用
 
-1. 仮想環境作成（推奨）:
-
-```
-python -m venv venv
-source venv/bin/activate  # Windowsは venv\Scripts\activate
-```
-
-2. 必要ライブラリのインストール:
-
-```
-pip install -r requirements.txt
-```
-
-3. 実行:
-
-```
-streamlit run app.py
-```
-
-## 保存先
-保存した記事は `saved_articles/` ディレクトリに `.txt` 形式で保存されます。
-
-## 注意
-- 文春オンラインは一覧取得できないため、URLを直接貼り付けてください。
+---
