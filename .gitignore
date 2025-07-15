@@ -1,14 +1,12 @@
-# Python
+# バーチャル環境
+venv/
 __pycache__/
+
+# 不要なファイル
 *.py[cod]
 *.egg-info/
+.DS_Store
 .env
 
-# VS Code
-.vscode/
-
-# OS
-.DS_Store
-
-# Streamlit saved data
+# Streamlitで保存されたファイルなど
 saved_articles/
